@@ -1,0 +1,5 @@
+{
+    "port":3500,
+    "dburl":"mongodb://localhost:27017/registerUser",
+    "userRoles": ["Manager", "Finance", "Field_executive", "SoftwareEngineer", "Automation"]
+}

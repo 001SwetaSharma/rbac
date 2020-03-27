@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+        <!--This page CSS-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+        <style>
+            .container {margin-top: 30px;}
+            h5{text-align:center;font-weight: bold;}
+            .nav-tabs .nav-item{
+                background:white !important;
+            }
+            .nav-tabs .nav-item .active {
+                background: #e5e5f5 !important;
+                color: black !important;
+            }
+            
+            .margin_top_2{margin-top: 2%;}
+            .msg{font-size:12px;color:red;}
+            .text-center{text-align: center;}
+            .display-none{display: none;}            
+            .select2-container{width: 100% !important;}
+            .select2-container--default .select2-selection--single {
+                height: 37px !important;
+                font-size: 0.9em;
+                width: 100% !important;
+            }
+            .black{color:black};
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h5>Register New User</h5>
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#new_user" role="tab">Register New User</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#view_user" role="tab">View Registered User</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="new_user" role="tabpanel">
+                    <div class="form-group row margin_top_2">
+                        <label class="col-sm-3 control-label col-form-label text-center">First Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="inp form-control" id="firstname" placeholder="Enter First Name">
+                            <div class="msg display-none">First Name cannot be blank</div>
+                        </div>
+                    </div>
+                    <div class="form-group row margin_top_2">
+                        <label class="col-sm-3 control-label col-form-label text-center">Last Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="inp form-control" id="lastname" placeholder="Enter Last Name">
+                            <div class="msg display-none">Last Name cannot be blank</div>
+                        </div>
+                    </div>
+                    <div class="form-group row margin_top_2">
+                        <label class="col-sm-3 control-label col-form-label text-center">User Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="inp form-control unique" id="username" placeholder="Enter User Name">
+                            <div class="msg display-none username_err">User Name cannot be empty</div>
+                        </div>
+                    </div>
+                    <div class="form-group row margin_top_2">
+                        <label class="col-sm-3 control-label col-form-label text-center">Password</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="inp form-control" id="password" placeholder="Enter Password">
+                            <div class="msg display-none">Password Cannote be blank</div>
+                        </div>
+                    </div>
+                    <div class="form-group row margin_top_2">
+                        <label class="col-sm-3 control-label col-form-label text-center">Email ID</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="inp form-control unique" id="emailid" placeholder="Enter Email ID">
+                            <div class="msg display-none emailid_err">Email id Cannot be empty.</div>
+                        </div>
+                    </div>
+                    <div class="form-group row margin_top_2 user_role_div display-none">
+                        <label class="col-sm-3 control-label col-form-label text-center">User Roles</label>
+                        <div class="col-sm-4">
+                            <select name="user_role" id="user_role" class="select2"></select>
+                            <div class="msg display-none">Select a user role</div>
+                        </div>
+                    </div>
+                    <div class="form-group row margin_top_2">
+                        <label class="col-sm-3 control-label col-form-label"></label>
+                        <div class="col-sm-4">
+                            <button class="btn btn-primary" type="button" name="register_btn" id="register_btn">Register New User</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade margin_top_2" id="view_user" role="tabpanel">
+                    <div class="col-md-10">
+                        <h4 class="text-center registered_user" style="margin-top:6%">No registration has been done yet !!</h4>
+                        <table class="table display-none" id="view_user_table" style="border: 1px solid #ccc6c6 !important;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center"><b>First Name</b></th>
+                                    <th scope="col" class="text-center"><b>Last Name</b></th>
+                                    <th scope="col" class="text-center"><b>User Name</b></th>
+                                    <th scope="col" class="text-center"><b>Email Id</b></th>
+                                    <th scope="col" class="text-center"><b>Access Permission</b></th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewUserTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    
+    
+    <!--This page JS-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> 
+    
+    
+    <!-- <script data-main="/js/register.js" src="/require.js"></script> -->
+    <!--You can write your JS code in a js File by including your js file with the help of above code-->
+    <!-- as there is less function so i am writting in the same file-->
+    <script>
+
+        //registering new user
+        let userCounter = 0;
+        $(document).ready(_ => {
+            check_Roles();
+            getUsers();
+        });
+
+        //checking roles
+        //if no roles is present then by default given admin or else give some other option of user roles
+        //for stability perspective we can add and store the user_roles in db.
+        let check_Roles = () => {
+            fetch('/register/checkRoles', {
+                method: "GET",
+                credentials: "include",
+                cache: "no-cache"
+            })
+            .then(response => response.json())
+            .then(out => {
+                userCounter = out.length;
+                if(out.length == 0) return false;
+                $('.user_role_div').removeClass('display-none');
+                let user_roles = ``;
+                for(var i=0;i<out.length;i++){
+                    user_roles += 
+                        `<option value="${out[i]}">${out[i]}</option>`
+                }
+                $('#user_role').html(user_roles);
+            });
+
+            $('.select2').select2({ minimumResultsForSearch: -1 });
+        }
+
+
+        //doing registration
+        $('#register_btn').on('click',function(e){
+            e.preventDefault();
+            let firstname = $('#firstname').val();
+            let lastname = $('#lastname').val();
+            let email_id = $('#emailid').val();
+            let username = $('#username').val();
+            let password = $('#password').val();
+            let user_role = $('#user_role option:selected').val();
+            
+            $('.msg').addClass('display-none');
+            $('#user_role').parent().find('.msg').addClass('display-none');
+            $('.username_err').html('User Name cannot be empty');
+            $('.emailid_err').html('Email id Cannot be empty');
+            let err_ctr = 0;
+
+            //checking if any field is empty or not
+            $(".inp").filter(function() {
+                if(!($(this).val())) {
+                    $(this).next().removeClass('display-none'); 
+                    err_ctr++;
+                }
+            });
+
+            if(err_ctr > 0) return false;
+
+            //validationg email id
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if(!regex.test(email_id)) {
+                $('.emailid_err').removeClass('display-none');
+                $('.emailid_err').html('Email id is not valid');
+                return false;
+            }
+
+            //checking if role is selected or not for other users
+            if(userCounter > 0 && !user_role) { $('#user_role').parent().find('.msg').removeClass('display-none'); return false;};
+            let data = {firstname,lastname,email_id,username,password,user_role};
+            postData('/register/registerNewUser', data)
+            .then(res => {
+                if(res.status==1){
+                    check_Roles();
+                    getUsers();
+                    $('.inp').val('');
+                    swal({text: `${res.msg}`,icon:"success",button: false,timer: 5000});
+                }else{
+                    if(res.faulty == 'both'){
+                        $('.emailid_err').html('emailid already taken');
+                        $('.username_err').html('username is already taken');
+                        $('.emailid_err').removeClass('display-none');
+                        $('.username_err').removeClass('display-none');
+                    }else{
+                        $(`.${res.faulty}_err`).html(`${res.faulty} is already taken`);
+                        $(`.${res.faulty}_err`).removeClass('display-none');
+                    } 
+
+                    
+                }
+
+            });
+        });
+
+
+        //displaying alll the registered users
+        let getUsers = () => {
+            fetch('/register/getUsers', {
+                method: "GET",
+                credentials: "include",
+                cache: "no-cache"
+            })
+            .then(response => response.json())
+            .then(df => {
+                console.log(Object.keys(df).length);
+                if(Object.keys(df).length == 0) {
+                    $('.registered_user').removeClass('display-none');
+                    $('#view_user_table').addClass('display-none');
+                    return false;
+                }
+                let tbody = '';
+                Object.keys(df).forEach(temp => {
+                    tbody += 
+                    `<tr>
+                        <td class="text-center black">${df[temp].firstname}</td>
+                        <td class="text-center black">${df[temp].username}</td>
+                        <td class="text-center black">${df[temp].emailid}</td>
+                        <td class="text-center black">${df[temp].access}</td>
+                        <td class="text-center black">${df[temp].lastname}</td>
+                    </tr>`
+                });
+                $('#viewUserTbody').html(tbody);
+                $('.registered_user').addClass('display-none');
+                $('#view_user_table').removeClass('display-none');
+            });
+        }
+
+        //wrapper for writting post methods
+        const postData = (url = ``, data = {}) => {
+            data = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&')
+            // Default options are marked with *
+            return fetch(url, {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                credentials: 'include',
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: data,
+            })
+            .then(response => response.json()) // parses response to JSON
+            .catch(error => console.error(`Fetch Error =\n`, error));
+        };
+    </script>
+
+</html>
